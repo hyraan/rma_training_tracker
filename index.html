@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridPulse // RMA Trainee Engineering Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        gridDark: '#060B14',
+                        gridCard: '#0D1524',
+                        gridBorder: '#1E293B',
+                        cyanPulse: '#06B6D4',
+                        emeraldVolt: '#10B981',
+                        amberSolar: '#F59E0B',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom High-Tech Engineering Grid Pattern */
+        .bg-engineering-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(6, 182, 212, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(6, 182, 212, 0.06) 1px, transparent 1px);
+        }
+        html:not(.dark) .bg-engineering-grid {
+            background-image: 
+                linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.35);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.6);
+        }
+
+        /* Smooth Progress Ring Transition */
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Checkbox Pop Animation */
+        @keyframes checkPop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+        .check-pop {
+            animation: checkPop 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-gridDark dark:text-slate-100 bg-engineering-grid min-h-screen font-sans antialiased transition-colors duration-300 selection:bg-cyan-500/30 selection:text-cyan-200">
+
+    <!-- Toast / Notification Banner Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Custom Modal Container (for Reset Confirmation / JSON Import / Info) -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-gridCard border border-slate-200 dark:border-slate-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="modal-icon-wrap" class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <h3 id="modal-title" class="text-lg font-bold">Confirm Action</h3>
+            </div>
+            <p id="modal-desc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5"></p>
+            <div id="modal-extra" class="mb-5 hidden"></div>
+            <div class="flex justify-end gap-3">
+                <button id="modal-cancel-btn" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
+                    Cancel
+                </button>
+                <button id="modal-confirm-btn" class="px-4 py-2 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20 transition">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input for JSON Restore -->
+    <input type="file" id="json-file-input" accept=".json" class="hidden" />
+
+    <!-- Top Control Room Navigation Header -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-gridDark/85 border-b border-slate-200/80 dark:border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <!-- Brand Identity -->
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/20">
+                    <i data-lucide="zap" class="w-5 h-5 stroke-[2.5]"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-base sm:text-lg tracking-tight">GridPulse <span class="text-cyan-600 dark:text-cyan-400 font-mono text-xs sm:text-sm font-semibold">// RMA</span></h1>
+                        <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                            REV: MAR 2026
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Undergraduate Trainee Engineer Syllabus & Telemetry</p>
+                </div>
+            </div>
+
+            <!-- Right Telemetry Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Google Sheets Cloud Sync Button & Live Badge -->
+                <button id="cloud-sync-btn" title="Configure or Trigger Google Sheets Sync" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all">
+                    <span id="sync-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <i data-lucide="cloud" class="w-3.5 h-3.5 text-cyan-500"></i>
+                    <span id="save-status-text">Local Only</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" title="Toggle Dark/Light Theme" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-700"></i>
+                </button>
+
+                <!-- Backup Dropdown / Actions -->
+                <div class="relative group">
+                    <button id="data-menu-btn" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition">
+                        <i data-lucide="database" class="w-4 h-4 text-cyan-500"></i>
+                        <span class="hidden sm:inline">Backup</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>
+                    </button>
+                    <div id="data-dropdown" class="hidden absolute right-0 mt-2 w-52 rounded-2xl bg-white dark:bg-gridCard border border-slate-200 dark:border-slate-700 shadow-2xl py-2 z-50">
+                        <button id="export-json-btn" class="w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center gap-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition">
+                            <i data-lucide="download" class="w-4 h-4 text-cyan-500"></i>
+                            <span>Export JSON Backup</span>
+                        </button>
+                        <button id="import-json-btn" class="w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center gap-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition">
+                            <i data-lucide="upload" class="w-4 h-4 text-emerald-500"></i>
+                            <span>Import JSON Backup</span>
+                        </button>
+                        <div class="my-1 border-t border-slate-200 dark:border-slate-800"></div>
+                        <button id="reset-progress-btn" class="w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center gap-2.5 text-rose-500 hover:bg-rose-500/10 transition">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            <span>Reset All Progress</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
+        <!-- Top Telemetry Overview Bento Grid -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
+            
+            <!-- Card 1: Master Training Completion Gauge (4 cols) -->
+            <div class="lg:col-span-4 bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm flex items-center justify-between gap-4 relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="space-y-2 z-10">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-semibold">
+                        <i data-lucide="activity" class="w-3.5 h-3.5"></i> System Readiness
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight" id="overall-percent-text">0%</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                        <span id="completed-count-text" class="font-mono font-bold text-slate-800 dark:text-slate-200">0</span> of 
+                        <span id="total-count-text" class="font-mono font-bold text-slate-800 dark:text-slate-200">0</span> syllabus items cleared
+                    </p>
+                    <div class="pt-1 flex flex-wrap gap-2">
+                        <span id="modules-cleared-badge" class="px-2.5 py-1 rounded-lg text-xs font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            0 / 12 Modules Complete
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Circular SVG Gauge -->
+                <div class="relative w-28 h-28 flex-shrink-0 flex items-center justify-center">
+                    <svg class="w-28 h-28" viewBox="0 0 100 100">
+                        <circle class="text-slate-200 dark:text-slate-800 stroke-current" stroke-width="9" cx="50" cy="50" r="40" fill="transparent"></circle>
+                        <circle id="overall-progress-ring" class="text-cyan-500 progress-ring-circle stroke-current" stroke-width="9" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <i data-lucide="cpu" class="w-6 h-6 text-cyan-500 mb-0.5"></i>
+                        <span class="text-[10px] font-mono uppercase text-slate-400">RMA GRID</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Trainee Profile & Supervisor Telemetry (5 cols) -->
+            <div class="lg:col-span-5 bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-semibold">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Trainee Engineer Dossier
+                    </span>
+                    <span class="text-[11px] font-mono text-slate-400">Auto-saves on edit</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">Trainee Name</label>
+                        <input type="text" id="profile-name" placeholder="e.g. K. Perera" class="w-full px-3 py-1.5 rounded-xl text-sm bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">Supervising Engineer</label>
+                        <input type="text" id="profile-supervisor" placeholder="e.g. Eng. S. Silva" class="w-full px-3 py-1.5 rounded-xl text-sm bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">University / Stream</label>
+                        <input type="text" id="profile-uni" placeholder="e.g. UoM / Electrical" class="w-full px-3 py-1.5 rounded-xl text-sm bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">Training Start Date</label>
+                        <input type="date" id="profile-start-date" class="w-full px-3 py-1.5 rounded-xl text-sm bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Allowance Payday Countdown (25th of Each Month) (3 cols) -->
+            <div class="lg:col-span-3 bg-gradient-to-br from-amber-500/10 via-white/90 to-white/90 dark:from-amber-500/15 dark:via-gridCard/95 dark:to-gridCard/95 backdrop-blur-md border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 font-semibold">
+                        <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Allowance Cycle
+                    </span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-600 dark:text-amber-300">
+                        25TH MONTHLY
+                    </span>
+                </div>
+                <div class="my-3">
+                    <div class="flex items-baseline gap-2">
+                        <span id="payday-countdown-days" class="text-3xl sm:text-4xl font-extrabold font-mono text-amber-600 dark:text-amber-400">--</span>
+                        <span id="payday-countdown-label" class="text-xs font-medium text-slate-600 dark:text-slate-300">days until next payout</span>
+                    </div>
+                    <p id="next-payday-date-str" class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">Next Payment: --</p>
+                </div>
+                <div class="pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                    <span>Monthly Trainee Allowance</span>
+                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">Active</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Two-Column Workspace: Left/Main Syllabus Modules + Right Sticky Engagement & Logbook -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Column: Filter Toolbar + 12 Syllabus Modules (8 cols) -->
+            <div class="lg:col-span-8 space-y-5">
+                
+                <!-- Search & Multi-Facet Filter Bar -->
+                <div class="bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <!-- Search Input -->
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input type="text" id="search-input" placeholder="Search syllabus topics (e.g., Mahaweli, SPP, AutoCAD, PUCSL, Net Plus)..." class="w-full pl-10 pr-9 py-2 rounded-xl text-sm bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition" />
+                            <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Status Filter & Expand/Collapse All -->
+                        <div class="flex items-center gap-2">
+                            <select id="status-filter" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition">
+                                <option value="all">All Status</option>
+                                <option value="pending">In Progress / Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="has-notes">With Notes</option>
+                            </select>
+
+                            <button id="toggle-expand-all-btn" title="Expand or Collapse All Modules" class="px-3 py-2 rounded-xl text-xs font-mono font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 whitespace-nowrap">
+                                <i data-lucide="chevrons-up-down" class="w-4 h-4 text-cyan-500"></i>
+                                <span id="expand-all-label">Collapse All</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Domain Category Filter Pills -->
+                    <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        <button data-category="all" class="cat-pill active px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500 text-slate-950 shadow-sm transition whitespace-nowrap">
+                            All Modules (12)
+                        </button>
+                        <button data-category="power-systems" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
+                            Core Power Systems
+                        </button>
+                        <button data-category="modeling-design" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
+                            Modeling & Design
+                        </button>
+                        <button data-category="field-audits" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
+                            Field, RE & Audits
+                        </button>
+                        <button data-category="deliverables" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
+                            Deliverables & Research
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Modules Container -->
+                <div id="modules-container" class="space-y-4">
+                    <!-- Rendered dynamically via JavaScript -->
+                </div>
+
+                <!-- Empty Search State -->
+                <div id="empty-search-state" class="hidden bg-white/90 dark:bg-gridCard/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                        <i data-lucide="search-x" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-base font-bold mb-1">No matching syllabus items found</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Try adjusting your search keywords or resetting the active category/status filters.</p>
+                    <button id="reset-filters-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition">
+                        Reset All Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Important RMA Directives & Field Logbook (4 cols) -->
+            <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-22">
+                
+                <!-- Panel 1: Important RMA Directives & Engagement Checklist -->
+                <div class="bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            <h3 class="font-bold text-sm uppercase tracking-wider font-mono text-amber-600 dark:text-amber-400">Important Directives</h3>
+                        </div>
+                        <span id="important-progress-pill" class="text-xs font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">0/4</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                        Key professional engagement milestones outlined in the March 2026 RMA Training Handbook:
+                    </p>
+
+                    <div id="important-items-list" class="space-y-2.5">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Panel 2: Quick Training Scratchpad / Daily NAITA Log Notes -->
+                <div class="bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="notebook-pen" class="w-4 h-4 text-cyan-500"></i>
+                            <h3 class="font-bold text-sm">Engineer's Field Scratchpad</h3>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-400" id="scratchpad-char-count">0 chars</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                        Jot down site visit observations, supervisor feedback, software tips, or weekly logbook summaries.
+                    </p>
+                    <textarea id="global-scratchpad" rows="6" placeholder="• Site visit notes (e.g., Victoria / Kotmale / Substation)&#10;• Key takeaways from evening industry presentations&#10;• Questions to ask supervising engineer..." class="w-full p-3 rounded-xl text-xs sm:text-sm bg-slate-100/80 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition leading-relaxed resize-y"></textarea>
+                    <div class="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                        <span>Stored locally in browser</span>
+                        <button id="copy-scratchpad-btn" class="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i> Copy Notes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Category Breakdown Mini-Telemetry -->
+                <div class="bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <h3 class="font-bold text-sm mb-3 flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-500"></i>
+                        <span>Domain Competency Telemetry</span>
+                    </h3>
+                    <div id="domain-telemetry-bars" class="space-y-3">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-8 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+        <div class="flex items-center gap-2">
+            <span class="font-mono font-semibold text-cyan-600 dark:text-cyan-400">GridPulse // RMA</span>
+            <span>•</span>
+            <span>Contents of Training for Undergraduate Trainees (Updated: March 2026)</span>
+        </div>
+        <div class="font-mono text-[11px]">
+            GitHub Pages + Google Sheets Cloud Sync
+        </div>
+    </footer>
+
+    <!-- Google Sheets Cloud Sync Setup Modal -->
+    <div id="sync-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-gridCard border border-slate-200 dark:border-slate-700/80 rounded-2xl max-w-lg w-full p-6 shadow-2xl transform transition-all max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-500 flex items-center justify-center">
+                        <i data-lucide="sheet" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Google Sheets Cloud Sync</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Sync across devices & share progress with your supervisor</p>
+                    </div>
+                </div>
+                <button id="close-sync-modal-btn" class="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Connection Status Card -->
+            <div id="sync-status-panel" class="p-3.5 rounded-xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 mb-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <div>
+                        <div id="modal-sync-state" class="text-xs font-bold font-mono uppercase">Not Connected (Local Storage Only)</div>
+                        <div id="modal-last-sync" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Last cloud sync: Never</div>
+                    </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">APPS SCRIPT</span>
+            </div>
+
+            <!-- Web App URL Input -->
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-500 dark:text-slate-400 mb-1.5">Google Apps Script Web App URL (/exec)</label>
+                    <input type="url" id="apps-script-url-input" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 focus:outline-none focus:border-cyan-500 transition" />
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="save-sync-url-btn" class="flex-1 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
+                        <i data-lucide="link" class="w-4 h-4"></i>
+                        <span>Save & Connect</span>
+                    </button>
+                    <button id="disconnect-sync-btn" class="px-3.5 py-2.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-rose-500/15 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-rose-500 border border-slate-200 dark:border-slate-700 transition">
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Sync Triggers -->
+            <div class="grid grid-cols-2 gap-3 mb-5 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button id="manual-pull-btn" class="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2">
+                    <i data-lucide="cloud-download" class="w-4 h-4 text-cyan-500"></i>
+                    <span>Pull from Sheet</span>
+                </button>
+                <button id="manual-push-btn" class="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2">
+                    <i data-lucide="cloud-upload" class="w-4 h-4 text-emerald-500"></i>
+                    <span>Push to Sheet</span>
+                </button>
+            </div>
+
+            <!-- Quick Setup Reference Accordion -->
+            <details class="rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 p-3.5 text-xs">
+                <summary class="font-semibold cursor-pointer text-slate-700 dark:text-slate-200 flex items-center justify-between">
+                    <span>How Google Apps Script Sync Works</span>
+                    <span class="text-[10px] font-mono text-cyan-500">API Spec</span>
+                </summary>
+                <div class="mt-2.5 space-y-2 text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <p>1. In your Google Sheet, go to <strong>Extensions → Apps Script</strong>, deploy your script as a <strong>Web app</strong> with access set to <strong>Anyone</strong>, and paste the <code>/exec</code> URL above.</p>
+                    <p>2. <strong>Auto-Pull:</strong> Opening this GitHub Pages URL automatically fetches <code>GET &lt;url&gt;</code> and merges your latest progress.</p>
+                    <p>3. <strong>Auto-Push:</strong> Checking any item or editing notes automatically saves locally and posts updates to your sheet after 1.2s.</p>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Application Logic & Complete Syllabus Dataset -->
+    <script>
+        // =========================================================================
+        // 1. COMPLETE RMA SYLLABUS DATA STRUCTURE (Accurate to March 2026 PDF)
+        // =========================================================================
+        const SYLLABUS_MODULES = [
+            {
+                id: 'mod-1',
+                number: '01',
+                title: 'Learn about Sri Lanka Energy Sector beyond the power sector.',
+                category: 'power-systems',
+                icon: 'flame',
+                accent: 'cyan',
+                items: [
+                    {
+                        id: 'm1-1',
+                        text: 'What are the primary, secondary and final sources of energy; what are their relative shares of contribution',
+                        tag: 'Energy Balance'
+                    },
+                    {
+                        id: 'm1-2',
+                        text: 'What sectors use petroleum products: transport, fisheries, electricity generation',
+                        tag: 'Petroleum'
+                    },
+                    {
+                        id: 'm1-3',
+                        text: 'What is the role of firewood and other biomass? industry, household',
+                        tag: 'Biomass'
+                    }
+                ]
+            },
+            {
+                id: 'mod-2',
+                number: '02',
+                title: 'Be familiar with the specific details of Sri Lanka power system.',
+                category: 'power-systems',
+                icon: 'zap',
+                accent: 'emerald',
+                items: [
+                    {
+                        id: 'm2-1',
+                        text: 'Historic development',
+                        tag: 'History'
+                    },
+                    {
+                        id: 'm2-2',
+                        text: 'Full list of generating plants',
+                        tag: 'Generation'
+                    },
+                    {
+                        id: 'm2-3',
+                        text: 'Hydro system and network of reservoirs, Mahaweli irrigation and power coordination',
+                        tag: 'Hydro / Mahaweli'
+                    },
+                    {
+                        id: 'm2-4',
+                        text: 'Thermal generation system, fuels, costs, ownership (IPP and CEB)',
+                        tag: 'Thermal / IPP'
+                    },
+                    {
+                        id: 'm2-5',
+                        text: 'Site Visits',
+                        tag: 'Site Visit',
+                        highlight: true
+                    },
+                    {
+                        id: 'm2-6',
+                        text: 'Small Power Producer (SPP) programme: policy, history, prices, SPP Agreement; how much of each type of SPP is in operation',
+                        tag: 'SPP / NCRE'
+                    },
+                    {
+                        id: 'm2-7',
+                        text: 'HV and MV Transmission network + equipment',
+                        tag: 'Transmission'
+                    },
+                    {
+                        id: 'm2-8',
+                        text: 'Distribution network layout, different practices of LECO & CEB',
+                        tag: 'LECO & CEB'
+                    },
+                    {
+                        id: 'm2-9',
+                        text: 'The problem of network technical and commercial losses',
+                        tag: 'Grid Losses'
+                    },
+                    {
+                        id: 'm2-10',
+                        text: 'Distributed generation: what are the schemes available for customers to contribute renewable energy to grid: specific details of net metering, net accounting and net plus schemes to develop solar PV',
+                        tag: 'Solar Schemes'
+                    },
+                    {
+                        id: 'm2-11',
+                        text: 'Analysis of one problem in generation or transmission or distribution, with your supervising engineer',
+                        tag: 'Case Analysis',
+                        highlight: true
+                    },
+                    {
+                        id: 'm2-12',
+                        text: 'How the electricity industry is regulated and its strengths and weaknesses.',
+                        tag: 'Regulation'
+                    }
+                ]
+            },
+            {
+                id: 'mod-3',
+                number: '03',
+                title: 'Transmission and distribution network analysis',
+                category: 'modeling-design',
+                icon: 'share-2',
+                accent: 'cyan',
+                items: [
+                    {
+                        id: 'm3-1',
+                        text: 'Modelling software',
+                        tag: 'Software'
+                    },
+                    {
+                        id: 'm3-2',
+                        text: 'Hands-on modelling work',
+                        tag: 'Hands-on'
+                    }
+                ]
+            },
+            {
+                id: 'mod-4',
+                number: '04',
+                title: 'Economic and financial modeling work in power sector',
+                category: 'modeling-design',
+                icon: 'trending-up',
+                accent: 'amber',
+                items: [
+                    {
+                        id: 'm4-1',
+                        text: 'Financial modeling of power plant projects',
+                        tag: 'Financial Model'
+                    },
+                    {
+                        id: 'm4-2',
+                        text: 'Electricity pricing methods and Sri Lanka tariff schedule; what are reasons for such a price structure, how can it be improved?',
+                        tag: 'SL Tariff'
+                    },
+                    {
+                        id: 'm4-3',
+                        text: 'Comparison of regional tariffs',
+                        tag: 'Benchmarking'
+                    }
+                ]
+            },
+            {
+                id: 'mod-5',
+                number: '05',
+                title: 'Renewable Energy',
+                category: 'field-audits',
+                icon: 'sun',
+                accent: 'emerald',
+                items: [
+                    {
+                        id: 'm5-1',
+                        text: 'Policy and status of development of renewable energy for grid and off-grid electricity generation',
+                        tag: 'RE Policy'
+                    },
+                    {
+                        id: 'm5-2',
+                        text: 'Solar PV plant conceptual design',
+                        tag: 'Solar PV'
+                    },
+                    {
+                        id: 'm5-3',
+                        text: 'Wind energy plant conceptual design',
+                        tag: 'Wind Power'
+                    }
+                ]
+            },
+            {
+                id: 'mod-6',
+                number: '06',
+                title: 'Integrated Building Services Engineering',
+                category: 'modeling-design',
+                icon: 'building-2',
+                accent: 'cyan',
+                items: [
+                    {
+                        id: 'm6-1',
+                        text: 'Electrical power distribution system design (LV distribution, load assessment, protection coordination, earthing, backup power integration)',
+                        tag: 'LV & Protection'
+                    },
+                    {
+                        id: 'm6-2',
+                        text: 'Room acoustics design (noise control, reverberation time analysis, sound insulation, vibration control)',
+                        tag: 'Acoustics'
+                    },
+                    {
+                        id: 'm6-3',
+                        text: 'HVAC electrical integration and power requirements',
+                        tag: 'HVAC'
+                    },
+                    {
+                        id: 'm6-4',
+                        text: 'Energy efficiency and power quality considerations',
+                        tag: 'Power Quality'
+                    }
+                ]
+            },
+            {
+                id: 'mod-7',
+                number: '07',
+                title: 'Mini-Grids, Micro-Grids & Demand-Side Management',
+                category: 'power-systems',
+                icon: 'network',
+                accent: 'emerald',
+                items: [
+                    {
+                        id: 'm7-1',
+                        text: 'Exposure to concepts of mini-grids, micro-grids, and the application of demand-side management and demand-response techniques.',
+                        tag: 'Micro-Grids & DSM'
+                    }
+                ]
+            },
+            {
+                id: 'mod-8',
+                number: '08',
+                title: 'Energy Efficiency & Industrial Audits',
+                category: 'field-audits',
+                icon: 'gauge',
+                accent: 'amber',
+                items: [
+                    {
+                        id: 'm8-1',
+                        text: 'Energy Efficiency: The Trainee Engineer will most likely participate in a walk-through energy audit in a factory, and hands-on use of instruments for energy measurements, both electrical and thermal (depending on the availability of projects).',
+                        tag: 'Factory Audit & Instruments',
+                        highlight: true
+                    }
+                ]
+            },
+            {
+                id: 'mod-9',
+                number: '09',
+                title: 'Staff Presentation on Project / Research',
+                category: 'deliverables',
+                icon: 'presentation',
+                accent: 'cyan',
+                items: [
+                    {
+                        id: 'm9-1',
+                        text: 'Presentation on project handled/research done by the Trainee to the Company staff',
+                        tag: 'Presentation',
+                        highlight: true
+                    }
+                ]
+            },
+            {
+                id: 'mod-10',
+                number: '10',
+                title: 'Technical & Formal Writing Skills',
+                category: 'deliverables',
+                icon: 'file-text',
+                accent: 'emerald',
+                items: [
+                    {
+                        id: 'm10-1',
+                        text: 'Writing skills to be practiced during report and letter writing work assigned to Trainees.',
+                        tag: 'Reports & Letters'
+                    }
+                ]
+            },
+            {
+                id: 'mod-11',
+                number: '11',
+                title: 'Drawing and Design Skills (AutoCAD 2-D)',
+                category: 'modeling-design',
+                icon: 'compass',
+                accent: 'amber',
+                items: [
+                    {
+                        id: 'm11-1',
+                        text: 'Drawing and design skills. Essential to learn AutoCAD 2-D modelling.',
+                        tag: 'AutoCAD 2-D',
+                        highlight: true
+                    }
+                ]
+            },
+            {
+                id: 'mod-12',
+                number: '12',
+                title: 'Technical Paper Publication',
+                category: 'deliverables',
+                icon: 'book-open-check',
+                accent: 'cyan',
+                items: [
+                    {
+                        id: 'm12-1',
+                        text: 'Writing a paper on your work and/or other assignments is encouraged.',
+                        tag: 'Research Paper'
+                    }
+                ]
+            }
+        ];
+
+        const IMPORTANT_DIRECTIVES = [
+            {
+                id: 'imp-1',
+                text: 'Plenty of opportunities to participate in activities in specific projects of the company, meet senior professionals in the energy sector'
+            },
+            {
+                id: 'imp-2',
+                text: 'You will be invited to attend various evening meetings, presentations, etc. relevant to electricity industry work. Join them to the best possible extent.'
+            },
+            {
+                id: 'imp-3',
+                text: 'Should have attended/or will attend a preliminary energy audit, depending on the space/opportunities available'
+            },
+            {
+                id: 'imp-4',
+                text: 'Actively engage with senior staff members by seeking their guidance on power sector matters and ongoing projects. Proactively ask questions and obtain clarifications to enhance your understanding and professional development.'
+            }
+        ];
+
+        const IMPORTANT_DIRECTIVES = [
+            {
+                id: 'imp-1',
+                text: 'Participate in activities in specific company projects & meet senior professionals in the energy sector'
+            },
+            {
+                id: 'imp-2',
+                text: 'Attend evening meetings, presentations, etc. relevant to electricity industry work to the best possible extent'
+            },
+            {
+                id: 'imp-3',
+                text: 'Attend a preliminary energy audit (depending on space/opportunities available)'
+            },
+            {
+                id: 'imp-4',
+                text: 'Actively engage with senior staff members by seeking guidance on power sector matters & proactively asking questions'
+            }
+        ];
+
+        const CATEGORY_LABELS = {
+            'power-systems': { name: 'Core Power Systems', color: 'cyan' },
+            'modeling-design': { name: 'Modeling & Design', color: 'amber' },
+            'field-audits': { name: 'Field, RE & Audits', color: 'emerald' },
+            'deliverables': { name: 'Deliverables & Research', color: 'indigo' }
+        };
+
+        // =========================================================================
+        // 2. STATE MANAGEMENT, LOCALSTORAGE & GOOGLE SHEETS CLOUD SYNC
+        // =========================================================================
+        const STORAGE_KEY = 'rma_trainee_tracker_v2026_1';
+        const SYNC_URL_KEY = 'rma_google_sheets_exec_url';
+
+        const defaultState = {
+            theme: 'dark',
+            profile: {
+                name: '',
+                supervisor: '',
+                university: '',
+                startDate: ''
+            },
+            completedItems: {}, // { itemId: "18 Nov 09:00 PM" }
+            itemNotes: {},      // { itemId: "User notes string..." }
+            importantChecked: {}, // { impId: true }
+            expandedNotes: {},  // { itemId: true/false }
+            collapsedModules: {}, // { modId: true/false }
+            scratchpad: '',
+            lastCloudSync: ''
+        };
+
+        let appState = loadState();
+        let sheetsWebAppUrl = localStorage.getItem(SYNC_URL_KEY) || '';
+        let activeCategory = 'all';
+        let activeStatus = 'all';
+        let searchQuery = '';
+        let allExpanded = true;
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return JSON.parse(JSON.stringify(defaultState));
+                const parsed = JSON.parse(raw);
+                return {
+                    ...JSON.parse(JSON.stringify(defaultState)),
+                    ...parsed,
+                    profile: { ...defaultState.profile, ...(parsed.profile || {}) }
+                };
+            } catch (e) {
+                console.error('Failed to load state from localStorage:', e);
+                return JSON.parse(JSON.stringify(defaultState));
+            }
+        }
+
+        function setSyncStatusUI(state, detailText = '') {
+            const btn = document.getElementById('cloud-sync-btn');
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('save-status-text');
+            const modalDot = document.getElementById('modal-sync-dot');
+            const modalState = document.getElementById('modal-sync-state');
+            const modalLastSync = document.getElementById('modal-last-sync');
+
+            if (!btn || !dot || !text) return;
+
+            dot.className = 'w-2 h-2 rounded-full';
+            if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full';
+
+            if (state === 'offline') {
+                dot.classList.add('bg-slate-400');
+                text.textContent = 'Local Only';
+                if (modalDot) modalDot.classList.add('bg-slate-400');
+                if (modalState) modalState.textContent = 'Not Connected (Local Storage Only)';
+            } else if (state === 'syncing') {
+                dot.classList.add('bg-cyan-400', 'animate-ping');
+                text.textContent = detailText || 'Syncing...';
+                if (modalDot) modalDot.classList.add('bg-cyan-400', 'animate-ping');
+                if (modalState) modalState.textContent = detailText || 'Syncing with Google Sheets...';
+            } else if (state === 'synced') {
+                dot.classList.add('bg-emerald-500');
+                text.textContent = 'Sheets Synced';
+                if (modalDot) modalDot.classList.add('bg-emerald-500');
+                if (modalState) modalState.textContent = 'Connected & Synced with Google Sheets';
+            } else if (state === 'error') {
+                dot.classList.add('bg-rose-500');
+                text.textContent = 'Sync Error';
+                if (modalDot) modalDot.classList.add('bg-rose-500');
+                if (modalState) modalState.textContent = detailText || 'Sync Error — Check Web App URL';
+            }
+
+            if (modalLastSync) {
+                modalLastSync.textContent = `Last cloud sync: ${appState.lastCloudSync || 'Never'}`;
+            }
+        }
+
+        function buildSheetPayloadItems() {
+            const items = [];
+            SYLLABUS_MODULES.forEach(mod => {
+                mod.items.forEach(item => {
+                    const completedDate = appState.completedItems[item.id] || '';
+                    items.push({
+                        id: item.id,
+                        module: `${mod.number}. ${mod.title}`,
+                        topic: item.text,
+                        completed: Boolean(completedDate),
+                        completedDate: completedDate,
+                        notes: appState.itemNotes[item.id] || ''
+                    });
+                });
+            });
+            // Also include Important Directives & Metadata rows so everything backs up to the Sheet
+            IMPORTANT_DIRECTIVES.forEach(imp => {
+                items.push({
+                    id: imp.id,
+                    module: 'Important Directives',
+                    topic: imp.text,
+                    completed: Boolean(appState.importantChecked[imp.id]),
+                    completedDate: appState.importantChecked[imp.id] ? 'Checked' : '',
+                    notes: ''
+                });
+            });
+            items.push({
+                id: 'meta-profile',
+                module: 'Trainee Dossier & Scratchpad',
+                topic: JSON.stringify(appState.profile),
+                completed: true,
+                completedDate: '',
+                notes: appState.scratchpad || ''
+            });
+            return items;
+        }
+
+        async function pushToGoogleSheets(silent = true) {
+            if (!sheetsWebAppUrl) {
+                setSyncStatusUI('offline');
+                return;
+            }
+            setSyncStatusUI('syncing', 'Pushing...');
+            try {
+                // Using text/plain;charset=utf-8 avoids CORS OPTIONS preflight in Google Apps Script
+                const response = await fetch(sheetsWebAppUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ items: buildSheetPayloadItems() })
+                });
+                const result = await response.json();
+                if (result && (result.status === 'saved' || result.status === 'ok')) {
+                    appState.lastCloudSync = result.updatedAt || formatTimestamp();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    setSyncStatusUI('synced');
+                    if (!silent) showToast('Progress pushed to Google Sheets!', 'success');
+                } else {
+                    throw new Error('Unexpected response from Apps Script');
+                }
+            } catch (err) {
+                console.error('Google Sheets Push Error:', err);
+                setSyncStatusUI('error', 'Push failed — verify Web App permissions');
+                if (!silent) showToast('Failed to push to Google Sheets. Check URL & "Anyone" access.', 'error');
+            }
+        }
+
+        async function pullFromGoogleSheets(silent = true) {
+            if (!sheetsWebAppUrl) {
+                setSyncStatusUI('offline');
+                return;
+            }
+            setSyncStatusUI('syncing', 'Pulling...');
+            try {
+                const response = await fetch(sheetsWebAppUrl, { method: 'GET' });
+                const data = await response.json();
+                if (!data || data.status !== 'ok' || typeof data.records !== 'object') {
+                    throw new Error('Invalid GET payload');
+                }
+
+                const records = data.records;
+                const recordKeys = Object.keys(records);
+
+                if (recordKeys.length > 0) {
+                    // Merge remote records into local state
+                    SYLLABUS_MODULES.forEach(mod => {
+                        mod.items.forEach(item => {
+                            const rec = records[item.id];
+                            if (rec) {
+                                if (rec.completed) {
+                                    appState.completedItems[item.id] = rec.completedDate || formatTimestamp();
+                                } else {
+                                    delete appState.completedItems[item.id];
+                                }
+                                if (typeof rec.notes === 'string') {
+                                    appState.itemNotes[item.id] = rec.notes;
+                                }
+                            }
+                        });
+                    });
+
+                    IMPORTANT_DIRECTIVES.forEach(imp => {
+                        const rec = records[imp.id];
+                        if (rec) {
+                            if (rec.completed) {
+                                appState.importantChecked[imp.id] = true;
+                            } else {
+                                delete appState.importantChecked[imp.id];
+                            }
+                        }
+                    });
+
+                    if (records['meta-profile']) {
+                        try {
+                            const parsedProfile = JSON.parse(records['meta-profile'].notes ? '{}' : '{}');
+                        } catch (_) {}
+                        if (typeof records['meta-profile'].notes === 'string') {
+                            appState.scratchpad = records['meta-profile'].notes;
+                            const spEl = document.getElementById('global-scratchpad');
+                            const ccEl = document.getElementById('scratchpad-char-count');
+                            if (spEl) spEl.value = appState.scratchpad;
+                            if (ccEl) ccEl.textContent = `${appState.scratchpad.length} chars`;
+                        }
+                    }
+
+                    appState.lastCloudSync = formatTimestamp();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    renderAll();
+                    setSyncStatusUI('synced');
+                    if (!silent) showToast('Latest progress pulled from Google Sheets!', 'success');
+                } else {
+                    // Sheet is currently empty; push initial local state up if user has progress
+                    appState.lastCloudSync = formatTimestamp();
+                    setSyncStatusUI('synced');
+                    if (!silent) showToast('Connected! Sheet is empty—pushing your checklist...', 'info');
+                    await pushToGoogleSheets(true);
+                }
+            } catch (err) {
+                console.error('Google Sheets Pull Error:', err);
+                setSyncStatusUI('error', 'Pull failed — check Web App URL');
+                if (!silent) showToast('Could not pull from Google Sheets. Check your /exec URL.', 'error');
+            }
+        }
+
+        let cloudPushDebounce = null;
+        function saveState(triggerCloudSync = true) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                if (!sheetsWebAppUrl) {
+                    setSyncStatusUI('offline');
+                    return;
+                }
+                if (triggerCloudSync) {
+                    setSyncStatusUI('syncing', 'Queued...');
+                    clearTimeout(cloudPushDebounce);
+                    cloudPushDebounce = setTimeout(() => {
+                        pushToGoogleSheets(true);
+                    }, 1200);
+                }
+            } catch (e) {
+                console.error('Failed to save state:', e);
+                showToast('Warning: Could not save to browser storage.', 'error');
+            }
+        }
+
+        // =========================================================================
+        // 3. ALLOWANCE PAYDAY CALCULATOR (25TH OF EACH MONTH)
+        // =========================================================================
+        function updatePaydayCountdown() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const currentDay = now.getDate();
+
+            let nextPayday;
+            if (currentDay <= 25) {
+                nextPayday = new Date(currentYear, currentMonth, 25);
+            } else {
+                nextPayday = new Date(currentYear, currentMonth + 1, 25);
+            }
+
+            // Strip hours for clean day diff
+            const todayMidnight = new Date(currentYear, currentMonth, currentDay);
+            const diffTime = nextPayday - todayMidnight;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            const daysEl = document.getElementById('payday-countdown-days');
+            const labelEl = document.getElementById('payday-countdown-label');
+            const dateStrEl = document.getElementById('next-payday-date-str');
+
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+            dateStrEl.textContent = `Payday: ${nextPayday.toLocaleDateString('en-US', options)}`;
+
+            if (diffDays === 0) {
+                daysEl.textContent = 'TODAY!';
+                daysEl.classList.add('text-emerald-500');
+                labelEl.textContent = 'Allowance payout day (25th)';
+            } else if (diffDays === 1) {
+                daysEl.textContent = '1';
+                labelEl.textContent = 'day until 25th payout';
+            } else {
+                daysEl.textContent = diffDays;
+                labelEl.textContent = 'days until 25th payout';
+            }
+        }
+
+        // =========================================================================
+        // 4. RENDERING ENGINE (MODULES, DIRECTIVES, TELEMETRY)
+        // =========================================================================
+        function renderAll() {
+            renderModules();
+            renderImportantDirectives();
+            updateOverallTelemetry();
+            lucide.createIcons();
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modules-container');
+            const emptyState = document.getElementById('empty-search-state');
+            container.innerHTML = '';
+
+            const query = searchQuery.trim().toLowerCase();
+            let visibleModuleCount = 0;
+
+            SYLLABUS_MODULES.forEach(mod => {
+                // Category Filter
+                if (activeCategory !== 'all' && mod.category !== activeCategory) {
+                    return;
+                }
+
+                // Filter inner items based on search & status
+                const filteredItems = mod.items.filter(item => {
+                    const isDone = Boolean(appState.completedItems[item.id]);
+                    const hasNote = Boolean(appState.itemNotes[item.id] && appState.itemNotes[item.id].trim().length > 0);
+
+                    if (activeStatus === 'completed' && !isDone) return false;
+                    if (activeStatus === 'pending' && isDone) return false;
+                    if (activeStatus === 'has-notes' && !hasNote) return false;
+
+                    if (query) {
+                        const matchMod = mod.title.toLowerCase().includes(query);
+                        const matchItem = item.text.toLowerCase().includes(query);
+                        const matchTag = item.tag.toLowerCase().includes(query);
+                        const matchNote = hasNote && appState.itemNotes[item.id].toLowerCase().includes(query);
+                        return matchMod || matchItem || matchTag || matchNote;
+                    }
+                    return true;
+                });
+
+                if (filteredItems.length === 0) return;
+                visibleModuleCount++;
+
+                // Calculate module completion stats (across all items in this module)
+                const totalModItems = mod.items.length;
+                const doneModItems = mod.items.filter(i => Boolean(appState.completedItems[i.id])).length;
+                const modPercent = Math.round((doneModItems / totalModItems) * 100);
+                const isModComplete = doneModItems === totalModItems;
+                const isCollapsed = Boolean(appState.collapsedModules[mod.id]);
+
+                const card = document.createElement('div');
+                card.className = `bg-white/95 dark:bg-gridCard/95 backdrop-blur-md border ${isModComplete ? 'border-emerald-500/40 shadow-emerald-500/5' : 'border-slate-200 dark:border-slate-800'} rounded-2xl shadow-sm transition-all duration-200 overflow-hidden`;
+
+                card.innerHTML = `
+                    <!-- Module Header -->
+                    <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition" onclick="toggleModuleCollapse('${mod.id}')">
+                        <div class="flex items-start sm:items-center gap-3.5">
+                            <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-mono font-bold text-sm ${
+                                isModComplete 
+                                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' 
+                                : 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
+                            }">
+                                ${isModComplete ? '<i data-lucide="check-circle-2" class="w-5 h-5"></i>' : mod.number}
+                            </div>
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2 mb-0.5">
+                                    <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Module ${mod.number}</span>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                        ${CATEGORY_LABELS[mod.category].name}
+                                    </span>
+                                    ${isModComplete ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">CLEARED</span>' : ''}
+                                </div>
+                                <h3 class="font-bold text-base sm:text-[17px] leading-snug text-slate-900 dark:text-slate-100">${mod.title}</h3>
+                            </div>
+                        </div>
+
+                        <!-- Right Module Progress & Quick Actions -->
+                        <div class="flex items-center justify-between sm:justify-end gap-3 pl-13 sm:pl-0" onclick="event.stopPropagation()">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-20 sm:w-24 h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500 ${isModComplete ? 'bg-emerald-500' : 'bg-cyan-500'}" style="width: ${modPercent}%"></div>
+                                </div>
+                                <span class="text-xs font-mono font-semibold w-12 text-right ${isModComplete ? 'text-emerald-500' : 'text-slate-600 dark:text-slate-300'}">${doneModItems}/${totalModItems}</span>
+                            </div>
+
+                            <!-- Quick Complete Module Button -->
+                            <button onclick="toggleEntireModule('${mod.id}')" title="${isModComplete ? 'Uncheck all items in module' : 'Mark entire module complete'}" class="p-2 rounded-xl text-xs font-mono border transition ${
+                                isModComplete 
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20' 
+                                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-cyan-500 hover:border-cyan-500/40'
+                            }">
+                                <i data-lucide="check-check" class="w-4 h-4"></i>
+                            </button>
+
+                            <!-- Collapse Chevron -->
+                            <button onclick="toggleModuleCollapse('${mod.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition">
+                                <i data-lucide="${isCollapsed ? 'chevron-down' : 'chevron-up'}" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checklist Items Body -->
+                    <div class="${isCollapsed ? 'hidden' : 'block'} border-t border-slate-100 dark:border-slate-800/80 divide-y divide-slate-100 dark:divide-slate-800/60">
+                        ${filteredItems.map(item => renderChecklistItemHTML(mod.id, item)).join('')}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            if (visibleModuleCount === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        function renderChecklistItemHTML(modId, item) {
+            const completedTimestamp = appState.completedItems[item.id];
+            const isDone = Boolean(completedTimestamp);
+            const noteText = appState.itemNotes[item.id] || '';
+            const hasNote = noteText.trim().length > 0;
+            const isNoteOpen = Boolean(appState.expandedNotes[item.id]);
+
+            return `
+                <div class="p-3.5 sm:px-5 transition-colors ${isDone ? 'bg-emerald-500/[0.03] dark:bg-emerald-500/[0.04]' : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/25'}">
+                    <div class="flex items-start gap-3.5">
+                        <!-- Custom Interactive Checkbox -->
+                        <button onclick="toggleChecklistItem('${modId}', '${item.id}')" aria-label="Toggle item completion" class="mt-0.5 w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center border-2 transition-all ${
+                            isDone 
+                            ? 'bg-emerald-500 border-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25 check-pop' 
+                            : 'border-slate-300 dark:border-slate-600 hover:border-cyan-500 bg-white dark:bg-slate-900'
+                        }">
+                            ${isDone ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                        </button>
+
+                        <!-- Item Label & Metadata -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold ${
+                                    item.highlight 
+                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25' 
+                                    : 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300'
+                                }">
+                                    ${item.tag}
+                                </span>
+                                ${item.highlight ? '<span class="text-[10px] font-mono text-amber-500 flex items-center gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-amber-500"></i> Key Deliverable</span>' : ''}
+                                ${isDone ? `<span class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Cleared ${completedTimestamp}</span>` : ''}
+                            </div>
+
+                            <p onclick="toggleChecklistItem('${modId}', '${item.id}')" class="text-sm sm:text-[15px] leading-relaxed cursor-pointer transition ${
+                                isDone 
+                                ? 'line-through text-slate-400 dark:text-slate-500' 
+                                : 'text-slate-800 dark:text-slate-200 font-medium'
+                            }">
+                                ${item.text}
+                            </p>
+
+                            <!-- Preview of existing note when drawer is closed -->
+                            ${hasNote && !isNoteOpen ? `
+                                <div onclick="toggleNoteDrawer('${item.id}')" class="mt-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900/90 border-l-2 border-cyan-500 text-xs text-slate-600 dark:text-slate-300 cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-800 transition truncate">
+                                    <span class="font-mono text-[10px] text-cyan-500 uppercase mr-1.5">Note:</span>${escapeHTML(noteText)}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Toggle Note Button -->
+                        <button onclick="toggleNoteDrawer('${item.id}')" title="Add or edit study/site notes" class="px-2.5 py-1.5 rounded-xl text-xs font-mono flex items-center gap-1.5 border transition flex-shrink-0 ${
+                            hasNote || isNoteOpen
+                            ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400'
+                            : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-cyan-500'
+                        }">
+                            <i data-lucide="message-square-plus" class="w-3.5 h-3.5"></i>
+                            <span class="hidden sm:inline">${hasNote ? 'Note' : 'Add Note'}</span>
+                        </button>
+                    </div>
+
+                    <!-- Expandable Per-Item Note Drawer -->
+                    ${isNoteOpen ? `
+                        <div class="mt-3 ml-9 p-3 rounded-xl bg-slate-100/90 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-mono uppercase text-cyan-600 dark:text-cyan-400 font-semibold">Trainee Engineering Notes</span>
+                                <button onclick="toggleNoteDrawer('${item.id}')" class="text-xs text-slate-400 hover:text-slate-200">Close</button>
+                            </div>
+                            <textarea 
+                                oninput="updateItemNote('${item.id}', this.value)" 
+                                rows="2" 
+                                placeholder="Record formulas, plant capacities, supervisor guidance, or document references..."
+                                class="w-full p-2.5 rounded-lg text-xs sm:text-sm bg-white dark:bg-gridDark border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 transition"
+                            >${escapeHTML(noteText)}</textarea>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderImportantDirectives() {
+            const list = document.getElementById('important-items-list');
+            const pill = document.getElementById('important-progress-pill');
+            let checkedCount = 0;
+
+            list.innerHTML = IMPORTANT_DIRECTIVES.map(imp => {
+                const isChecked = Boolean(appState.importantChecked[imp.id]);
+                if (isChecked) checkedCount++;
+
+                return `
+                    <div onclick="toggleImportantItem('${imp.id}')" class="p-3 rounded-xl border cursor-pointer transition flex items-start gap-3 ${
+                        isChecked 
+                        ? 'bg-amber-500/10 border-amber-500/30 text-slate-500 dark:text-slate-400' 
+                        : 'bg-slate-50 dark:bg-slate-900/70 border-slate-200/80 dark:border-slate-800 hover:border-amber-500/40'
+                    }">
+                        <div class="mt-0.5 w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center border transition ${
+                            isChecked 
+                            ? 'bg-amber-500 border-amber-500 text-slate-950' 
+                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                        }">
+                            ${isChecked ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>' : ''}
+                        </div>
+                        <span class="text-xs leading-relaxed ${isChecked ? 'line-through' : 'font-medium text-slate-700 dark:text-slate-200'}">
+                            ${imp.text}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            pill.textContent = `${checkedCount}/${IMPORTANT_DIRECTIVES.length}`;
+        }
+
+        function updateOverallTelemetry() {
+            let totalItems = 0;
+            let completedItems = 0;
+            let completedModules = 0;
+
+            const domainStats = {
+                'power-systems': { total: 0, done: 0 },
+                'modeling-design': { total: 0, done: 0 },
+                'field-audits': { total: 0, done: 0 },
+                'deliverables': { total: 0, done: 0 }
+            };
+
+            SYLLABUS_MODULES.forEach(mod => {
+                const modTotal = mod.items.length;
+                const modDone = mod.items.filter(i => Boolean(appState.completedItems[i.id])).length;
+
+                totalItems += modTotal;
+                completedItems += modDone;
+                if (modDone === modTotal) completedModules++;
+
+                if (domainStats[mod.category]) {
+                    domainStats[mod.category].total += modTotal;
+                    domainStats[mod.category].done += modDone;
+                }
+            });
+
+            const percent = totalItems === 0 ? 0 : Math.round((completedItems / totalItems) * 100);
+
+            document.getElementById('overall-percent-text').textContent = `${percent}%`;
+            document.getElementById('completed-count-text').textContent = completedItems;
+            document.getElementById('total-count-text').textContent = totalItems;
+            document.getElementById('modules-cleared-badge').textContent = `${completedModules} / ${SYLLABUS_MODULES.length} Modules Complete`;
+
+            // Update SVG Circular Ring (circumference = 2 * PI * 40 = 251.2)
+            const ring = document.getElementById('overall-progress-ring');
+            const circumference = 251.2;
+            const offset = circumference - (percent / 100) * circumference;
+            ring.style.strokeDashoffset = offset;
+            if (percent === 100) {
+                ring.classList.remove('text-cyan-500');
+                ring.classList.add('text-emerald-500');
+            } else {
+                ring.classList.add('text-cyan-500');
+                ring.classList.remove('text-emerald-500');
+            }
+
+            // Update Domain Telemetry Bars
+            const barsContainer = document.getElementById('domain-telemetry-bars');
+            barsContainer.innerHTML = Object.entries(domainStats).map(([key, stat]) => {
+                const pct = stat.total === 0 ? 0 : Math.round((stat.done / stat.total) * 100);
+                const label = CATEGORY_LABELS[key].name;
+                return `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-medium text-slate-700 dark:text-slate-300">${label}</span>
+                            <span class="font-mono text-slate-500 dark:text-slate-400">${stat.done}/${stat.total} (${pct}%)</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                            <div class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // 5. INTERACTIVE HANDLERS
+        // =========================================================================
+        function formatTimestamp() {
+            const now = new Date();
+            return now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' +
+                   now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        function toggleChecklistItem(modId, itemId) {
+            const mod = SYLLABUS_MODULES.find(m => m.id === modId);
+            const wasModComplete = mod.items.every(i => Boolean(appState.completedItems[i.id]));
+
+            if (appState.completedItems[itemId]) {
+                delete appState.completedItems[itemId];
+            } else {
+                appState.completedItems[itemId] = formatTimestamp();
+            }
+
+            saveState();
+            renderAll();
+
+            // Check if this action just completed the entire module or 100% of training
+            const isModNowComplete = mod.items.every(i => Boolean(appState.completedItems[i.id]));
+            if (!wasModComplete && isModNowComplete) {
+                triggerCelebration(`Module ${mod.number} Cleared! Great engineering work.`);
+            }
+        }
+
+        function toggleEntireModule(modId) {
+            const mod = SYLLABUS_MODULES.find(m => m.id === modId);
+            const isAllDone = mod.items.every(i => Boolean(appState.completedItems[i.id]));
+            const ts = formatTimestamp();
+
+            if (isAllDone) {
+                mod.items.forEach(i => delete appState.completedItems[i.id]);
+                showToast(`Reset Module ${mod.number} items.`, 'info');
+            } else {
+                mod.items.forEach(i => {
+                    if (!appState.completedItems[i.id]) {
+                        appState.completedItems[i.id] = ts;
+                    }
+                });
+                triggerCelebration(`Module ${mod.number} Completed!`);
+            }
+
+            saveState();
+            renderAll();
+        }
+
+        function toggleModuleCollapse(modId) {
+            appState.collapsedModules[modId] = !appState.collapsedModules[modId];
+            saveState(false);
+            renderModules();
+            lucide.createIcons();
+        }
+
+        function toggleNoteDrawer(itemId) {
+            appState.expandedNotes[itemId] = !appState.expandedNotes[itemId];
+            saveState(false);
+            renderModules();
+            lucide.createIcons();
+        }
+
+        function updateItemNote(itemId, value) {
+            appState.itemNotes[itemId] = value;
+            saveState();
+        }
+
+        function toggleImportantItem(impId) {
+            if (appState.importantChecked[impId]) {
+                delete appState.importantChecked[impId];
+            } else {
+                appState.importantChecked[impId] = true;
+            }
+            saveState();
+            renderImportantDirectives();
+            lucide.createIcons();
+        }
+
+        function triggerCelebration(message) {
+            showToast(message, 'success');
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 65,
+                    spread: 70,
+                    origin: { y: 0.7 },
+                    colors: ['#06B6D4', '#10B981', '#F59E0B']
+                });
+            }
+        }
+
+        // =========================================================================
+        // 6. TOASTS, MODALS & BACKUP UTILITIES
+        // =========================================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200',
+                error: 'bg-rose-950/95 border-rose-500/50 text-rose-200',
+                info: 'bg-slate-900/95 border-cyan-500/50 text-slate-100'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl backdrop-blur-md text-xs sm:text-sm font-medium transform transition-all duration-300 translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+            toast.innerHTML = `
+                <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-400' : type === 'error' ? 'bg-rose-400' : 'bg-cyan-400'}"></span>
+                <span>${escapeHTML(message)}</span>
+            `;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function openConfirmModal({ title, description, confirmLabel = 'Confirm', onConfirm }) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-desc').textContent = description;
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            confirmBtn.textContent = confirmLabel;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            document.getElementById('modal-cancel-btn').onclick = cleanup;
+            confirmBtn.onclick = () => {
+                cleanup();
+                onConfirm();
+            };
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // =========================================================================
+        // 7. INITIALIZATION & EVENT LISTENERS
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Apply saved theme
+            if (appState.theme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Hydrate Profile Inputs
+            const nameInput = document.getElementById('profile-name');
+            const supInput = document.getElementById('profile-supervisor');
+            const uniInput = document.getElementById('profile-uni');
+            const startInput = document.getElementById('profile-start-date');
+
+            nameInput.value = appState.profile.name || '';
+            supInput.value = appState.profile.supervisor || '';
+            uniInput.value = appState.profile.university || '';
+            startInput.value = appState.profile.startDate || '';
+
+            nameInput.addEventListener('input', e => { appState.profile.name = e.target.value; saveState(); });
+            supInput.addEventListener('input', e => { appState.profile.supervisor = e.target.value; saveState(); });
+            uniInput.addEventListener('input', e => { appState.profile.university = e.target.value; saveState(); });
+            startInput.addEventListener('input', e => { appState.profile.startDate = e.target.value; saveState(); });
+
+            // Hydrate Scratchpad
+            const scratchpad = document.getElementById('global-scratchpad');
+            const charCount = document.getElementById('scratchpad-char-count');
+            scratchpad.value = appState.scratchpad || '';
+            charCount.textContent = `${scratchpad.value.length} chars`;
+
+            scratchpad.addEventListener('input', e => {
+                appState.scratchpad = e.target.value;
+                charCount.textContent = `${e.target.value.length} chars`;
+                saveState();
+            });
+
+            // Copy Scratchpad Notes (iFrame-safe fallback)
+            document.getElementById('copy-scratchpad-btn').addEventListener('click', () => {
+                scratchpad.select();
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showToast('Field scratchpad notes copied to clipboard!', 'success');
+            });
+
+            // Theme Toggle Button
+            document.getElementById('theme-toggle').addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                appState.theme = isDark ? 'dark' : 'light';
+                saveState(false);
+            });
+
+            // Search Input & Clear Button
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+
+            searchInput.addEventListener('input', e => {
+                searchQuery = e.target.value;
+                clearSearchBtn.classList.toggle('hidden', searchQuery.length === 0);
+                renderModules();
+                lucide.createIcons();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchQuery = '';
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                renderModules();
+                lucide.createIcons();
+            });
+
+            // Status Filter
+            document.getElementById('status-filter').addEventListener('change', e => {
+                activeStatus = e.target.value;
+                renderModules();
+                lucide.createIcons();
+            });
+
+            // Category Pills
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.cat-pill').forEach(p => {
+                        p.classList.remove('active', 'bg-cyan-500', 'text-slate-950', 'font-semibold', 'shadow-sm');
+                        p.classList.add('bg-slate-100', 'dark:bg-slate-800/80', 'text-slate-600', 'dark:text-slate-300', 'font-medium');
+                    });
+                    btn.classList.add('active', 'bg-cyan-500', 'text-slate-950', 'font-semibold', 'shadow-sm');
+                    btn.classList.remove('bg-slate-100', 'dark:bg-slate-800/80', 'text-slate-600', 'dark:text-slate-300', 'font-medium');
+
+                    activeCategory = btn.dataset.category;
+                    renderModules();
+                    lucide.createIcons();
+                });
+            });
+
+            // Reset Filters Button in Empty State
+            document.getElementById('reset-filters-btn').addEventListener('click', () => {
+                searchQuery = '';
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                activeStatus = 'all';
+                document.getElementById('status-filter').value = 'all';
+                document.querySelector('.cat-pill[data-category="all"]').click();
+            });
+
+            // Expand / Collapse All Modules
+            document.getElementById('toggle-expand-all-btn').addEventListener('click', () => {
+                allExpanded = !allExpanded;
+                SYLLABUS_MODULES.forEach(m => {
+                    appState.collapsedModules[m.id] = !allExpanded;
+                });
+                document.getElementById('expand-all-label').textContent = allExpanded ? 'Collapse All' : 'Expand All';
+                saveState(false);
+                renderModules();
+                lucide.createIcons();
+            });
+
+            // Backup Dropdown Toggle
+            const dataMenuBtn = document.getElementById('data-menu-btn');
+            const dataDropdown = document.getElementById('data-dropdown');
+            dataMenuBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                dataDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => dataDropdown.classList.add('hidden'));
+
+            // Export JSON Backup
+            document.getElementById('export-json-btn').addEventListener('click', () => {
+                const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(appState, null, 2));
+                const downloadAnchor = document.createElement('a');
+                const dateTag = new Date().toISOString().slice(0, 10);
+                downloadAnchor.setAttribute('href', dataStr);
+                downloadAnchor.setAttribute('download', `RMA_Trainee_Progress_${dateTag}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showToast('Training progress exported as JSON backup.', 'success');
+            });
+
+            // Import JSON Backup
+            const fileInput = document.getElementById('json-file-input');
+            document.getElementById('import-json-btn').addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (!imported || typeof imported !== 'object' || !imported.completedItems) {
+                            throw new Error('Invalid backup structure');
+                        }
+                        appState = {
+                            ...JSON.parse(JSON.stringify(defaultState)),
+                            ...imported,
+                            profile: { ...defaultState.profile, ...(imported.profile || {}) }
+                        };
+                        saveState();
+                        nameInput.value = appState.profile.name || '';
+                        supInput.value = appState.profile.supervisor || '';
+                        uniInput.value = appState.profile.university || '';
+                        startInput.value = appState.profile.startDate || '';
+                        scratchpad.value = appState.scratchpad || '';
+                        charCount.textContent = `${scratchpad.value.length} chars`;
+                        renderAll();
+                        showToast('Backup restored successfully!', 'success');
+                    } catch (err) {
+                        showToast('Invalid JSON backup file selected.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                fileInput.value = '';
+            });
+
+            // Reset All Progress
+            document.getElementById('reset-progress-btn').addEventListener('click', () => {
+                openConfirmModal({
+                    title: 'Reset All Training Progress?',
+                    description: 'This will clear all checked syllabus modules, completion timestamps, item notes, and your scratchpad. Consider exporting a JSON backup first.',
+                    confirmLabel: 'Reset Everything',
+                    onConfirm: () => {
+                        const currentTheme = appState.theme;
+                        appState = JSON.parse(JSON.stringify(defaultState));
+                        appState.theme = currentTheme;
+                        saveState();
+                        nameInput.value = '';
+                        supInput.value = '';
+                        uniInput.value = '';
+                        startInput.value = '';
+                        scratchpad.value = '';
+                        charCount.textContent = '0 chars';
+                        renderAll();
+                        showToast('All progress has been reset.', 'info');
+                    }
+                });
+            });
+
+            // Initialize Payday Countdown & Render Dashboard
+            updatePaydayCountdown();
+            renderAll();
+
+            // Initialize Google Sheets Sync Modal & Auto-Pull on Load
+            const syncModal = document.getElementById('sync-modal');
+            const urlInput = document.getElementById('apps-script-url-input');
+            urlInput.value = sheetsWebAppUrl;
+
+            document.getElementById('cloud-sync-btn').addEventListener('click', () => {
+                urlInput.value = sheetsWebAppUrl;
+                setSyncStatusUI(sheetsWebAppUrl ? 'synced' : 'offline');
+                syncModal.classList.remove('hidden');
+                syncModal.classList.add('flex');
+                lucide.createIcons();
+            });
+
+            document.getElementById('close-sync-modal-btn').addEventListener('click', () => {
+                syncModal.classList.add('hidden');
+                syncModal.classList.remove('flex');
+            });
+
+            document.getElementById('save-sync-url-btn').addEventListener('click', async () => {
+                const val = urlInput.value.trim();
+                if (!val || !val.startsWith('https://script.google.com/')) {
+                    showToast('Please enter a valid Google Apps Script Web App URL (https://script.google.com/.../exec)', 'error');
+                    return;
+                }
+                sheetsWebAppUrl = val;
+                localStorage.setItem(SYNC_URL_KEY, sheetsWebAppUrl);
+                await pullFromGoogleSheets(false);
+            });
+
+            document.getElementById('disconnect-sync-btn').addEventListener('click', () => {
+                sheetsWebAppUrl = '';
+                urlInput.value = '';
+                localStorage.removeItem(SYNC_URL_KEY);
+                setSyncStatusUI('offline');
+                showToast('Disconnected from Google Sheets. Using local browser storage.', 'info');
+            });
+
+            document.getElementById('manual-pull-btn').addEventListener('click', () => {
+                if (!sheetsWebAppUrl) {
+                    showToast('Paste and save your Apps Script Web App URL first.', 'error');
+                    return;
+                }
+                pullFromGoogleSheets(false);
+            });
+
+            document.getElementById('manual-push-btn').addEventListener('click', () => {
+                if (!sheetsWebAppUrl) {
+                    showToast('Paste and save your Apps Script Web App URL first.', 'error');
+                    return;
+                }
+                pushToGoogleSheets(false);
+            });
+
+            // Auto-pull latest progress from Google Sheets on startup if configured
+            if (sheetsWebAppUrl) {
+                pullFromGoogleSheets(true);
+            } else {
+                setSyncStatusUI('offline');
+            }
+        });
+    </script>
+</body>
+</html>

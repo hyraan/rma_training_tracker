@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Canvas Confetti for Celebrations -->
+    <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script>
@@ -31,17 +31,14 @@
                         cyanPulse: '#06B6D4',
                         emeraldVolt: '#10B981',
                         amberSolar: '#F59E0B',
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
-        }
+        };
     </script>
 
     <style>
-        /* Custom High-Tech Engineering Grid Pattern */
+        /* High-Tech Engineering Grid Pattern */
         .bg-engineering-grid {
             background-size: 32px 32px;
             background-image: 
@@ -93,17 +90,16 @@
     <!-- Toast / Notification Banner Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Custom Modal Container (for Reset Confirmation / JSON Import / Info) -->
+    <!-- Confirmation Modal Container -->
     <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
         <div class="bg-white dark:bg-gridCard border border-slate-200 dark:border-slate-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
             <div class="flex items-center gap-3 mb-3">
-                <div id="modal-icon-wrap" class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                 </div>
                 <h3 id="modal-title" class="text-lg font-bold">Confirm Action</h3>
             </div>
             <p id="modal-desc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5"></p>
-            <div id="modal-extra" class="mb-5 hidden"></div>
             <div class="flex justify-end gap-3">
                 <button id="modal-cancel-btn" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
                     Cancel
@@ -137,7 +133,7 @@
                             REV: MAR 2026
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Undergraduate Trainee Engineer Syllabus & Telemetry</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Undergraduate Trainee Engineer Syllabus &amp; Telemetry</p>
                 </div>
             </div>
 
@@ -145,9 +141,9 @@
             <div class="flex items-center gap-2 sm:gap-3">
                 <!-- Google Sheets Cloud Sync Button & Live Badge -->
                 <button id="cloud-sync-btn" title="Configure or Trigger Google Sheets Sync" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all">
-                    <span id="sync-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <i data-lucide="cloud" class="w-3.5 h-3.5 text-cyan-500"></i>
-                    <span id="save-status-text">Local Only</span>
+                    <span id="save-status-text">Sheets Synced</span>
                 </button>
 
                 <!-- Theme Toggle -->
@@ -156,8 +152,8 @@
                     <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-700"></i>
                 </button>
 
-                <!-- Backup Dropdown / Actions -->
-                <div class="relative group">
+                <!-- Backup Dropdown -->
+                <div class="relative">
                     <button id="data-menu-btn" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition">
                         <i data-lucide="database" class="w-4 h-4 text-cyan-500"></i>
                         <span class="hidden sm:inline">Backup</span>
@@ -295,7 +291,7 @@
                         <div class="flex items-center gap-2">
                             <select id="status-filter" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition">
                                 <option value="all">All Status</option>
-                                <option value="pending">In Progress / Pending</option>
+                                <option value="pending">Pending</option>
                                 <option value="completed">Completed</option>
                                 <option value="has-notes">With Notes</option>
                             </select>
@@ -308,7 +304,7 @@
                     </div>
 
                     <!-- Domain Category Filter Pills -->
-                    <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1">
                         <button data-category="all" class="cat-pill active px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500 text-slate-950 shadow-sm transition whitespace-nowrap">
                             All Modules (12)
                         </button>
@@ -316,21 +312,19 @@
                             Core Power Systems
                         </button>
                         <button data-category="modeling-design" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
-                            Modeling & Design
+                            Modeling &amp; Design
                         </button>
                         <button data-category="field-audits" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
-                            Field, RE & Audits
+                            Field, RE &amp; Audits
                         </button>
                         <button data-category="deliverables" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap">
-                            Deliverables & Research
+                            Deliverables &amp; Research
                         </button>
                     </div>
                 </div>
 
                 <!-- Dynamic Modules Container -->
-                <div id="modules-container" class="space-y-4">
-                    <!-- Rendered dynamically via JavaScript -->
-                </div>
+                <div id="modules-container" class="space-y-4"></div>
 
                 <!-- Empty Search State -->
                 <div id="empty-search-state" class="hidden bg-white/90 dark:bg-gridCard/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center">
@@ -346,7 +340,7 @@
             </div>
 
             <!-- Right Column: Important RMA Directives & Field Logbook (4 cols) -->
-            <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-22">
+            <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-20">
                 
                 <!-- Panel 1: Important RMA Directives & Engagement Checklist -->
                 <div class="bg-white/90 dark:bg-gridCard/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
@@ -361,9 +355,7 @@
                         Key professional engagement milestones outlined in the March 2026 RMA Training Handbook:
                     </p>
 
-                    <div id="important-items-list" class="space-y-2.5">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="important-items-list" class="space-y-2.5"></div>
                 </div>
 
                 <!-- Panel 2: Quick Training Scratchpad / Daily NAITA Log Notes -->
@@ -380,7 +372,7 @@
                     </p>
                     <textarea id="global-scratchpad" rows="6" placeholder="• Site visit notes (e.g., Victoria / Kotmale / Substation)&#10;• Key takeaways from evening industry presentations&#10;• Questions to ask supervising engineer..." class="w-full p-3 rounded-xl text-xs sm:text-sm bg-slate-100/80 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 focus:outline-none focus:border-cyan-500 transition leading-relaxed resize-y"></textarea>
                     <div class="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                        <span>Stored locally in browser</span>
+                        <span>Auto-saved &amp; synced</span>
                         <button id="copy-scratchpad-btn" class="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1">
                             <i data-lucide="copy" class="w-3 h-3"></i> Copy Notes
                         </button>
@@ -393,9 +385,7 @@
                         <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-500"></i>
                         <span>Domain Competency Telemetry</span>
                     </h3>
-                    <div id="domain-telemetry-bars" class="space-y-3">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="domain-telemetry-bars" class="space-y-3"></div>
                 </div>
 
             </aside>
@@ -424,7 +414,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold">Google Sheets Cloud Sync</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Sync across devices & share progress with your supervisor</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Sync across devices &amp; share progress with your supervisor</p>
                     </div>
                 </div>
                 <button id="close-sync-modal-btn" class="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
@@ -435,10 +425,10 @@
             <!-- Connection Status Card -->
             <div id="sync-status-panel" class="p-3.5 rounded-xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 mb-4 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                    <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     <div>
-                        <div id="modal-sync-state" class="text-xs font-bold font-mono uppercase">Not Connected (Local Storage Only)</div>
-                        <div id="modal-last-sync" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Last cloud sync: Never</div>
+                        <div id="modal-sync-state" class="text-xs font-bold font-mono uppercase">Connected to Google Sheets</div>
+                        <div id="modal-last-sync" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Last cloud sync: Ready</div>
                     </div>
                 </div>
                 <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">APPS SCRIPT</span>
@@ -454,7 +444,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <button id="save-sync-url-btn" class="flex-1 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
                         <i data-lucide="link" class="w-4 h-4"></i>
-                        <span>Save & Connect</span>
+                        <span>Save &amp; Connect</span>
                     </button>
                     <button id="disconnect-sync-btn" class="px-3.5 py-2.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-rose-500/15 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-rose-500 border border-slate-200 dark:border-slate-700 transition">
                         Disconnect
@@ -481,8 +471,8 @@
                     <span class="text-[10px] font-mono text-cyan-500">API Spec</span>
                 </summary>
                 <div class="mt-2.5 space-y-2 text-slate-600 dark:text-slate-400 leading-relaxed">
-                    <p>1. In your Google Sheet, go to <strong>Extensions → Apps Script</strong>, deploy your script as a <strong>Web app</strong> with access set to <strong>Anyone</strong>, and paste the <code>/exec</code> URL above.</p>
-                    <p>2. <strong>Auto-Pull:</strong> Opening this GitHub Pages URL automatically fetches <code>GET &lt;url&gt;</code> and merges your latest progress.</p>
+                    <p>1. Pre-configured with your Apps Script <code>/exec</code> endpoint so any device opening this page syncs automatically.</p>
+                    <p>2. <strong>Auto-Pull:</strong> Opening this URL automatically fetches <code>GET &lt;url&gt;</code> and merges your latest progress.</p>
                     <p>3. <strong>Auto-Push:</strong> Checking any item or editing notes automatically saves locally and posts updates to your sheet after 1.2s.</p>
                 </div>
             </details>
@@ -492,30 +482,30 @@
     <!-- Application Logic & Complete Syllabus Dataset -->
     <script>
         // =========================================================================
-        // 1. COMPLETE RMA SYLLABUS DATA STRUCTURE (Accurate to March 2026 PDF)
+        // 1. PRE-CONFIGURED GOOGLE SHEETS ENDPOINT & COMPLETE RMA SYLLABUS DATA
         // =========================================================================
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybeSfn2cKMUESNVwGc90h6YyRb0JGSWDAw49LVtXpbCIXA7zzvoztUkfkFcQBN6yz9/exec";
+
         const SYLLABUS_MODULES = [
             {
                 id: 'mod-1',
                 number: '01',
-                title: 'Learn about Sri Lanka Energy Sector beyond the power sector.',
+                title: 'Sri Lanka Energy Sector Beyond Power',
                 category: 'power-systems',
-                icon: 'flame',
-                accent: 'cyan',
                 items: [
                     {
                         id: 'm1-1',
-                        text: 'What are the primary, secondary and final sources of energy; what are their relative shares of contribution',
+                        text: 'Primary, secondary, and final sources of energy & their relative shares of contribution',
                         tag: 'Energy Balance'
                     },
                     {
                         id: 'm1-2',
-                        text: 'What sectors use petroleum products: transport, fisheries, electricity generation',
+                        text: 'Sectors using petroleum products: transport, fisheries, electricity generation',
                         tag: 'Petroleum'
                     },
                     {
                         id: 'm1-3',
-                        text: 'What is the role of firewood and other biomass? industry, household',
+                        text: 'Role of firewood and other biomass in industry and households',
                         tag: 'Biomass'
                     }
                 ]
@@ -523,71 +513,69 @@
             {
                 id: 'mod-2',
                 number: '02',
-                title: 'Be familiar with the specific details of Sri Lanka power system.',
+                title: 'Sri Lanka Power System Specifics',
                 category: 'power-systems',
-                icon: 'zap',
-                accent: 'emerald',
                 items: [
                     {
                         id: 'm2-1',
-                        text: 'Historic development',
+                        text: 'Historic development of the Sri Lanka power system',
                         tag: 'History'
                     },
                     {
                         id: 'm2-2',
-                        text: 'Full list of generating plants',
+                        text: 'Full list of generating plants in Sri Lanka',
                         tag: 'Generation'
                     },
                     {
                         id: 'm2-3',
-                        text: 'Hydro system and network of reservoirs, Mahaweli irrigation and power coordination',
+                        text: 'Hydro system, network of reservoirs, Mahaweli irrigation and power coordination',
                         tag: 'Hydro / Mahaweli'
                     },
                     {
                         id: 'm2-4',
-                        text: 'Thermal generation system, fuels, costs, ownership (IPP and CEB)',
+                        text: 'Thermal generation system, fuels, costs, and ownership (IPP and CEB)',
                         tag: 'Thermal / IPP'
                     },
                     {
                         id: 'm2-5',
-                        text: 'Site Visits',
+                        text: 'Site visits to generation, transmission, and distribution facilities',
                         tag: 'Site Visit',
                         highlight: true
                     },
                     {
                         id: 'm2-6',
-                        text: 'Small Power Producer (SPP) programme: policy, history, prices, SPP Agreement; how much of each type of SPP is in operation',
+                        text: 'Small Power Producer (SPP) programme: policy, history, prices, SPP Agreement, and operational capacity by type',
                         tag: 'SPP / NCRE'
                     },
                     {
                         id: 'm2-7',
-                        text: 'HV and MV Transmission network + equipment',
+                        text: 'HV and MV transmission network architecture and substation equipment',
                         tag: 'Transmission'
                     },
                     {
                         id: 'm2-8',
-                        text: 'Distribution network layout, different practices of LECO & CEB',
+                        text: 'Distribution network layout and comparative practices of LECO & CEB',
                         tag: 'LECO & CEB'
                     },
                     {
                         id: 'm2-9',
-                        text: 'The problem of network technical and commercial losses',
+                        text: 'Network technical and commercial losses analysis',
                         tag: 'Grid Losses'
                     },
                     {
                         id: 'm2-10',
-                        text: 'Distributed generation: what are the schemes available for customers to contribute renewable energy to grid: specific details of net metering, net accounting and net plus schemes to develop solar PV',
+                        text: 'Distributed generation schemes: specific details of Net Metering, Net Accounting, and Net Plus for Solar PV',
                         tag: 'Solar Schemes'
                     },
                     {
                         id: 'm2-11',
-                        text: 'Analysis of one problem in generation or transmission or distribution, with your supervising engineer',
+                        text: 'Technical problem analysis in generation, transmission, or distribution with supervising engineer',
                         tag: 'Case Analysis',
                         highlight: true
                     },
                     {
                         id: 'm2-12',
-                        text: 'How the electricity industry is regulated and its strengths and weaknesses.',
+                        text: 'Electricity industry regulation (PUCSL), its strengths, and weaknesses',
                         tag: 'Regulation'
                     }
                 ]
@@ -595,19 +583,17 @@
             {
                 id: 'mod-3',
                 number: '03',
-                title: 'Transmission and distribution network analysis',
+                title: 'Transmission & Distribution Network Analysis',
                 category: 'modeling-design',
-                icon: 'share-2',
-                accent: 'cyan',
                 items: [
                     {
                         id: 'm3-1',
-                        text: 'Modelling software',
+                        text: 'Power system modelling software familiarity (PSS/E, ETAP, DIgSILENT, etc.)',
                         tag: 'Software'
                     },
                     {
                         id: 'm3-2',
-                        text: 'Hands-on modelling work',
+                        text: 'Hands-on T&D network modelling and simulation work',
                         tag: 'Hands-on'
                     }
                 ]
@@ -615,24 +601,22 @@
             {
                 id: 'mod-4',
                 number: '04',
-                title: 'Economic and financial modeling work in power sector',
+                title: 'Economic & Financial Modeling in Power Sector',
                 category: 'modeling-design',
-                icon: 'trending-up',
-                accent: 'amber',
                 items: [
                     {
                         id: 'm4-1',
-                        text: 'Financial modeling of power plant projects',
+                        text: 'Financial modeling of power plant projects (NPV, IRR, LCOE, cash flows)',
                         tag: 'Financial Model'
                     },
                     {
                         id: 'm4-2',
-                        text: 'Electricity pricing methods and Sri Lanka tariff schedule; what are reasons for such a price structure, how can it be improved?',
+                        text: 'Electricity pricing methods, Sri Lanka tariff schedule, rationale, and areas for improvement',
                         tag: 'SL Tariff'
                     },
                     {
                         id: 'm4-3',
-                        text: 'Comparison of regional tariffs',
+                        text: 'Regional electricity tariff comparison across South/Southeast Asia',
                         tag: 'Benchmarking'
                     }
                 ]
@@ -640,24 +624,22 @@
             {
                 id: 'mod-5',
                 number: '05',
-                title: 'Renewable Energy',
+                title: 'Renewable Energy Development & Design',
                 category: 'field-audits',
-                icon: 'sun',
-                accent: 'emerald',
                 items: [
                     {
                         id: 'm5-1',
-                        text: 'Policy and status of development of renewable energy for grid and off-grid electricity generation',
+                        text: 'Policy and development status of renewable energy for grid and off-grid generation',
                         tag: 'RE Policy'
                     },
                     {
                         id: 'm5-2',
-                        text: 'Solar PV plant conceptual design',
+                        text: 'Solar PV power plant conceptual design',
                         tag: 'Solar PV'
                     },
                     {
                         id: 'm5-3',
-                        text: 'Wind energy plant conceptual design',
+                        text: 'Wind energy power plant conceptual design',
                         tag: 'Wind Power'
                     }
                 ]
@@ -667,12 +649,10 @@
                 number: '06',
                 title: 'Integrated Building Services Engineering',
                 category: 'modeling-design',
-                icon: 'building-2',
-                accent: 'cyan',
                 items: [
                     {
                         id: 'm6-1',
-                        text: 'Electrical power distribution system design (LV distribution, load assessment, protection coordination, earthing, backup power integration)',
+                        text: 'Electrical power distribution system design (LV distribution, load assessment, protection coordination, earthing, backup power)',
                         tag: 'LV & Protection'
                     },
                     {
@@ -687,7 +667,7 @@
                     },
                     {
                         id: 'm6-4',
-                        text: 'Energy efficiency and power quality considerations',
+                        text: 'Building energy efficiency and power quality considerations',
                         tag: 'Power Quality'
                     }
                 ]
@@ -696,29 +676,36 @@
                 id: 'mod-7',
                 number: '07',
                 title: 'Mini-Grids, Micro-Grids & Demand-Side Management',
-                category: 'power-systems',
-                icon: 'network',
-                accent: 'emerald',
+                category: 'field-audits',
                 items: [
                     {
                         id: 'm7-1',
-                        text: 'Exposure to concepts of mini-grids, micro-grids, and the application of demand-side management and demand-response techniques.',
-                        tag: 'Micro-Grids & DSM'
+                        text: 'Exposure to mini-grid and micro-grid concepts and architectures',
+                        tag: 'Micro-Grids'
+                    },
+                    {
+                        id: 'm7-2',
+                        text: 'Application of Demand-Side Management (DSM) and Demand-Response (DR) techniques',
+                        tag: 'DSM & DR'
                     }
                 ]
             },
             {
                 id: 'mod-8',
                 number: '08',
-                title: 'Energy Efficiency & Industrial Audits',
+                title: 'Energy Efficiency & Factory Audits',
                 category: 'field-audits',
-                icon: 'gauge',
-                accent: 'amber',
                 items: [
                     {
                         id: 'm8-1',
-                        text: 'Energy Efficiency: The Trainee Engineer will most likely participate in a walk-through energy audit in a factory, and hands-on use of instruments for energy measurements, both electrical and thermal (depending on the availability of projects).',
-                        tag: 'Factory Audit & Instruments',
+                        text: 'Participation in a walk-through energy audit in a factory',
+                        tag: 'Factory Audit',
+                        highlight: true
+                    },
+                    {
+                        id: 'm8-2',
+                        text: 'Hands-on use of electrical and thermal energy measurement instruments',
+                        tag: 'Instruments',
                         highlight: true
                     }
                 ]
@@ -726,14 +713,12 @@
             {
                 id: 'mod-9',
                 number: '09',
-                title: 'Staff Presentation on Project / Research',
+                title: 'Company Staff Project Presentation',
                 category: 'deliverables',
-                icon: 'presentation',
-                accent: 'cyan',
                 items: [
                     {
                         id: 'm9-1',
-                        text: 'Presentation on project handled/research done by the Trainee to the Company staff',
+                        text: 'Prepare and deliver presentation on project handled / research done to RMA staff',
                         tag: 'Presentation',
                         highlight: true
                     }
@@ -742,14 +727,12 @@
             {
                 id: 'mod-10',
                 number: '10',
-                title: 'Technical & Formal Writing Skills',
+                title: 'Professional & Technical Writing Skills',
                 category: 'deliverables',
-                icon: 'file-text',
-                accent: 'emerald',
                 items: [
                     {
                         id: 'm10-1',
-                        text: 'Writing skills to be practiced during report and letter writing work assigned to Trainees.',
+                        text: 'Practice technical report and formal business letter writing assigned to trainees',
                         tag: 'Reports & Letters'
                     }
                 ]
@@ -757,14 +740,12 @@
             {
                 id: 'mod-11',
                 number: '11',
-                title: 'Drawing and Design Skills (AutoCAD 2-D)',
+                title: 'Engineering Drawing & AutoCAD 2-D',
                 category: 'modeling-design',
-                icon: 'compass',
-                accent: 'amber',
                 items: [
                     {
                         id: 'm11-1',
-                        text: 'Drawing and design skills. Essential to learn AutoCAD 2-D modelling.',
+                        text: 'Develop drawing and design skills using AutoCAD 2-D modelling',
                         tag: 'AutoCAD 2-D',
                         highlight: true
                     }
@@ -773,14 +754,12 @@
             {
                 id: 'mod-12',
                 number: '12',
-                title: 'Technical Paper Publication',
+                title: 'Technical Paper & Research Publication',
                 category: 'deliverables',
-                icon: 'book-open-check',
-                accent: 'cyan',
                 items: [
                     {
                         id: 'm12-1',
-                        text: 'Writing a paper on your work and/or other assignments is encouraged.',
+                        text: 'Write a technical paper on training work and/or assigned research projects',
                         tag: 'Research Paper'
                     }
                 ]
@@ -790,46 +769,27 @@
         const IMPORTANT_DIRECTIVES = [
             {
                 id: 'imp-1',
-                text: 'Plenty of opportunities to participate in activities in specific projects of the company, meet senior professionals in the energy sector'
+                text: 'Participate actively in specific RMA project activities and meet senior energy sector professionals'
             },
             {
                 id: 'imp-2',
-                text: 'You will be invited to attend various evening meetings, presentations, etc. relevant to electricity industry work. Join them to the best possible extent.'
+                text: 'Attend evening meetings and presentations relevant to the electricity industry'
             },
             {
                 id: 'imp-3',
-                text: 'Should have attended/or will attend a preliminary energy audit, depending on the space/opportunities available'
+                text: 'Attend a preliminary energy audit (subject to project availability)'
             },
             {
                 id: 'imp-4',
-                text: 'Actively engage with senior staff members by seeking their guidance on power sector matters and ongoing projects. Proactively ask questions and obtain clarifications to enhance your understanding and professional development.'
-            }
-        ];
-
-        const IMPORTANT_DIRECTIVES = [
-            {
-                id: 'imp-1',
-                text: 'Participate in activities in specific company projects & meet senior professionals in the energy sector'
-            },
-            {
-                id: 'imp-2',
-                text: 'Attend evening meetings, presentations, etc. relevant to electricity industry work to the best possible extent'
-            },
-            {
-                id: 'imp-3',
-                text: 'Attend a preliminary energy audit (depending on space/opportunities available)'
-            },
-            {
-                id: 'imp-4',
-                text: 'Actively engage with senior staff members by seeking guidance on power sector matters & proactively asking questions'
+                text: 'Proactively engage senior staff members for guidance and clarifications on power sector matters'
             }
         ];
 
         const CATEGORY_LABELS = {
-            'power-systems': { name: 'Core Power Systems', color: 'cyan' },
-            'modeling-design': { name: 'Modeling & Design', color: 'amber' },
-            'field-audits': { name: 'Field, RE & Audits', color: 'emerald' },
-            'deliverables': { name: 'Deliverables & Research', color: 'indigo' }
+            'power-systems': { name: 'Core Power Systems' },
+            'modeling-design': { name: 'Modeling & Design' },
+            'field-audits': { name: 'Field, RE & Audits' },
+            'deliverables': { name: 'Deliverables & Research' }
         };
 
         // =========================================================================
@@ -837,6 +797,7 @@
         // =========================================================================
         const STORAGE_KEY = 'rma_trainee_tracker_v2026_1';
         const SYNC_URL_KEY = 'rma_google_sheets_exec_url';
+        const SYNC_DISABLED_KEY = 'rma_google_sheets_disabled';
 
         const defaultState = {
             theme: 'dark',
@@ -846,17 +807,28 @@
                 university: '',
                 startDate: ''
             },
-            completedItems: {}, // { itemId: "18 Nov 09:00 PM" }
-            itemNotes: {},      // { itemId: "User notes string..." }
-            importantChecked: {}, // { impId: true }
-            expandedNotes: {},  // { itemId: true/false }
-            collapsedModules: {}, // { modId: true/false }
+            completedItems: {},
+            itemNotes: {},
+            importantChecked: {},
+            expandedNotes: {},
+            collapsedModules: {},
             scratchpad: '',
             lastCloudSync: ''
         };
 
+        function resolveInitialSyncUrl() {
+            try {
+                const isExplicitlyDisconnected = localStorage.getItem(SYNC_DISABLED_KEY) === 'true';
+                if (isExplicitlyDisconnected) return '';
+                const storedUrl = localStorage.getItem(SYNC_URL_KEY);
+                return storedUrl ? storedUrl : DEFAULT_APPS_SCRIPT_URL;
+            } catch (e) {
+                return DEFAULT_APPS_SCRIPT_URL;
+            }
+        }
+
         let appState = loadState();
-        let sheetsWebAppUrl = localStorage.getItem(SYNC_URL_KEY) || '';
+        let sheetsWebAppUrl = resolveInitialSyncUrl();
         let activeCategory = 'all';
         let activeStatus = 'all';
         let searchQuery = '';
@@ -914,7 +886,7 @@
             }
 
             if (modalLastSync) {
-                modalLastSync.textContent = `Last cloud sync: ${appState.lastCloudSync || 'Never'}`;
+                modalLastSync.textContent = `Last cloud sync: ${appState.lastCloudSync || 'Ready'}`;
             }
         }
 
@@ -933,7 +905,7 @@
                     });
                 });
             });
-            // Also include Important Directives & Metadata rows so everything backs up to the Sheet
+
             IMPORTANT_DIRECTIVES.forEach(imp => {
                 items.push({
                     id: imp.id,
@@ -944,6 +916,7 @@
                     notes: ''
                 });
             });
+
             items.push({
                 id: 'meta-profile',
                 module: 'Trainee Dossier & Scratchpad',
@@ -952,47 +925,63 @@
                 completedDate: '',
                 notes: appState.scratchpad || ''
             });
+
             return items;
         }
 
-        async function pushToGoogleSheets(silent = true) {
+        async function pushToSheets(silent = true) {
             if (!sheetsWebAppUrl) {
                 setSyncStatusUI('offline');
                 return;
             }
-            setSyncStatusUI('syncing', 'Pushing...');
+            setSyncStatusUI('syncing', 'Syncing...');
             try {
-                // Using text/plain;charset=utf-8 avoids CORS OPTIONS preflight in Google Apps Script
                 const response = await fetch(sheetsWebAppUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ items: buildSheetPayloadItems() })
                 });
-                const result = await response.json();
+                const textResp = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(textResp);
+                } catch (_) {
+                    throw new Error('Non-JSON response from Apps Script');
+                }
+
                 if (result && (result.status === 'saved' || result.status === 'ok')) {
                     appState.lastCloudSync = result.updatedAt || formatTimestamp();
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    } catch (_) {}
                     setSyncStatusUI('synced');
                     if (!silent) showToast('Progress pushed to Google Sheets!', 'success');
                 } else {
-                    throw new Error('Unexpected response from Apps Script');
+                    throw new Error('Unexpected response status');
                 }
             } catch (err) {
                 console.error('Google Sheets Push Error:', err);
-                setSyncStatusUI('error', 'Push failed — verify Web App permissions');
-                if (!silent) showToast('Failed to push to Google Sheets. Check URL & "Anyone" access.', 'error');
+                setSyncStatusUI('error', 'Sync Error — Check Web App URL');
+                if (!silent) showToast('Failed to push to Google Sheets. Check URL & permissions.', 'error');
             }
         }
 
-        async function pullFromGoogleSheets(silent = true) {
+        async function pullFromSheets(silent = true) {
             if (!sheetsWebAppUrl) {
                 setSyncStatusUI('offline');
                 return;
             }
-            setSyncStatusUI('syncing', 'Pulling...');
+            setSyncStatusUI('syncing', 'Syncing...');
             try {
                 const response = await fetch(sheetsWebAppUrl, { method: 'GET' });
-                const data = await response.json();
+                const textResp = await response.text();
+                let data = {};
+                try {
+                    data = JSON.parse(textResp);
+                } catch (_) {
+                    throw new Error('Non-JSON GET response');
+                }
+
                 if (!data || data.status !== 'ok' || typeof data.records !== 'object') {
                     throw new Error('Invalid GET payload');
                 }
@@ -1001,7 +990,6 @@
                 const recordKeys = Object.keys(records);
 
                 if (recordKeys.length > 0) {
-                    // Merge remote records into local state
                     SYLLABUS_MODULES.forEach(mod => {
                         mod.items.forEach(item => {
                             const rec = records[item.id];
@@ -1029,34 +1017,30 @@
                         }
                     });
 
-                    if (records['meta-profile']) {
-                        try {
-                            const parsedProfile = JSON.parse(records['meta-profile'].notes ? '{}' : '{}');
-                        } catch (_) {}
-                        if (typeof records['meta-profile'].notes === 'string') {
-                            appState.scratchpad = records['meta-profile'].notes;
-                            const spEl = document.getElementById('global-scratchpad');
-                            const ccEl = document.getElementById('scratchpad-char-count');
-                            if (spEl) spEl.value = appState.scratchpad;
-                            if (ccEl) ccEl.textContent = `${appState.scratchpad.length} chars`;
-                        }
+                    if (records['meta-profile'] && typeof records['meta-profile'].notes === 'string') {
+                        appState.scratchpad = records['meta-profile'].notes;
+                        const spEl = document.getElementById('global-scratchpad');
+                        const ccEl = document.getElementById('scratchpad-char-count');
+                        if (spEl) spEl.value = appState.scratchpad;
+                        if (ccEl) ccEl.textContent = `${appState.scratchpad.length} chars`;
                     }
 
                     appState.lastCloudSync = formatTimestamp();
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    } catch (_) {}
                     renderAll();
                     setSyncStatusUI('synced');
                     if (!silent) showToast('Latest progress pulled from Google Sheets!', 'success');
                 } else {
-                    // Sheet is currently empty; push initial local state up if user has progress
                     appState.lastCloudSync = formatTimestamp();
                     setSyncStatusUI('synced');
-                    if (!silent) showToast('Connected! Sheet is empty—pushing your checklist...', 'info');
-                    await pushToGoogleSheets(true);
+                    if (!silent) showToast('Connected! Pushing initial checklist to Google Sheets...', 'info');
+                    await pushToSheets(true);
                 }
             } catch (err) {
                 console.error('Google Sheets Pull Error:', err);
-                setSyncStatusUI('error', 'Pull failed — check Web App URL');
+                setSyncStatusUI('error', 'Sync Error — Check Web App URL');
                 if (!silent) showToast('Could not pull from Google Sheets. Check your /exec URL.', 'error');
             }
         }
@@ -1065,20 +1049,20 @@
         function saveState(triggerCloudSync = true) {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-                if (!sheetsWebAppUrl) {
-                    setSyncStatusUI('offline');
-                    return;
-                }
-                if (triggerCloudSync) {
-                    setSyncStatusUI('syncing', 'Queued...');
-                    clearTimeout(cloudPushDebounce);
-                    cloudPushDebounce = setTimeout(() => {
-                        pushToGoogleSheets(true);
-                    }, 1200);
-                }
             } catch (e) {
                 console.error('Failed to save state:', e);
-                showToast('Warning: Could not save to browser storage.', 'error');
+            }
+
+            if (!sheetsWebAppUrl) {
+                setSyncStatusUI('offline');
+                return;
+            }
+            if (triggerCloudSync) {
+                setSyncStatusUI('syncing', 'Syncing...');
+                clearTimeout(cloudPushDebounce);
+                cloudPushDebounce = setTimeout(() => {
+                    pushToSheets(true);
+                }, 1200);
             }
         }
 
@@ -1098,7 +1082,6 @@
                 nextPayday = new Date(currentYear, currentMonth + 1, 25);
             }
 
-            // Strip hours for clean day diff
             const todayMidnight = new Date(currentYear, currentMonth, currentDay);
             const diffTime = nextPayday - todayMidnight;
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
@@ -1108,7 +1091,7 @@
             const dateStrEl = document.getElementById('next-payday-date-str');
 
             const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
-            dateStrEl.textContent = `Payday: ${nextPayday.toLocaleDateString('en-US', options)}`;
+            dateStrEl.textContent = `Next Payment: ${nextPayday.toLocaleDateString('en-US', options)}`;
 
             if (diffDays === 0) {
                 daysEl.textContent = 'TODAY!';
@@ -1116,21 +1099,27 @@
                 labelEl.textContent = 'Allowance payout day (25th)';
             } else if (diffDays === 1) {
                 daysEl.textContent = '1';
-                labelEl.textContent = 'day until 25th payout';
+                labelEl.textContent = 'day until next payout';
             } else {
                 daysEl.textContent = diffDays;
-                labelEl.textContent = 'days until 25th payout';
+                labelEl.textContent = 'days until next payout';
             }
         }
 
         // =========================================================================
         // 4. RENDERING ENGINE (MODULES, DIRECTIVES, TELEMETRY)
         // =========================================================================
+        function safeRefreshIcons() {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+        }
+
         function renderAll() {
             renderModules();
             renderImportantDirectives();
             updateOverallTelemetry();
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function renderModules() {
@@ -1142,12 +1131,10 @@
             let visibleModuleCount = 0;
 
             SYLLABUS_MODULES.forEach(mod => {
-                // Category Filter
                 if (activeCategory !== 'all' && mod.category !== activeCategory) {
                     return;
                 }
 
-                // Filter inner items based on search & status
                 const filteredItems = mod.items.filter(item => {
                     const isDone = Boolean(appState.completedItems[item.id]);
                     const hasNote = Boolean(appState.itemNotes[item.id] && appState.itemNotes[item.id].trim().length > 0);
@@ -1169,7 +1156,6 @@
                 if (filteredItems.length === 0) return;
                 visibleModuleCount++;
 
-                // Calculate module completion stats (across all items in this module)
                 const totalModItems = mod.items.length;
                 const doneModItems = mod.items.filter(i => Boolean(appState.completedItems[i.id])).length;
                 const modPercent = Math.round((doneModItems / totalModItems) * 100);
@@ -1387,7 +1373,6 @@
             document.getElementById('total-count-text').textContent = totalItems;
             document.getElementById('modules-cleared-badge').textContent = `${completedModules} / ${SYLLABUS_MODULES.length} Modules Complete`;
 
-            // Update SVG Circular Ring (circumference = 2 * PI * 40 = 251.2)
             const ring = document.getElementById('overall-progress-ring');
             const circumference = 251.2;
             const offset = circumference - (percent / 100) * circumference;
@@ -1400,7 +1385,6 @@
                 ring.classList.remove('text-emerald-500');
             }
 
-            // Update Domain Telemetry Bars
             const barsContainer = document.getElementById('domain-telemetry-bars');
             barsContainer.innerHTML = Object.entries(domainStats).map(([key, stat]) => {
                 const pct = stat.total === 0 ? 0 : Math.round((stat.done / stat.total) * 100);
@@ -1441,7 +1425,6 @@
             saveState();
             renderAll();
 
-            // Check if this action just completed the entire module or 100% of training
             const isModNowComplete = mod.items.every(i => Boolean(appState.completedItems[i.id]));
             if (!wasModComplete && isModNowComplete) {
                 triggerCelebration(`Module ${mod.number} Cleared! Great engineering work.`);
@@ -1473,14 +1456,14 @@
             appState.collapsedModules[modId] = !appState.collapsedModules[modId];
             saveState(false);
             renderModules();
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function toggleNoteDrawer(itemId) {
             appState.expandedNotes[itemId] = !appState.expandedNotes[itemId];
             saveState(false);
             renderModules();
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function updateItemNote(itemId, value) {
@@ -1496,7 +1479,7 @@
             }
             saveState();
             renderImportantDirectives();
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function triggerCelebration(message) {
@@ -1576,7 +1559,6 @@
         // 7. INITIALIZATION & EVENT LISTENERS
         // =========================================================================
         window.addEventListener('DOMContentLoaded', () => {
-            // Apply saved theme
             if (appState.theme === 'light') {
                 document.documentElement.classList.remove('dark');
             } else {
@@ -1611,7 +1593,7 @@
                 saveState();
             });
 
-            // Copy Scratchpad Notes (iFrame-safe fallback)
+            // Copy Scratchpad Notes
             document.getElementById('copy-scratchpad-btn').addEventListener('click', () => {
                 scratchpad.select();
                 document.execCommand('copy');
@@ -1634,7 +1616,7 @@
                 searchQuery = e.target.value;
                 clearSearchBtn.classList.toggle('hidden', searchQuery.length === 0);
                 renderModules();
-                lucide.createIcons();
+                safeRefreshIcons();
             });
 
             clearSearchBtn.addEventListener('click', () => {
@@ -1642,14 +1624,14 @@
                 searchInput.value = '';
                 clearSearchBtn.classList.add('hidden');
                 renderModules();
-                lucide.createIcons();
+                safeRefreshIcons();
             });
 
             // Status Filter
             document.getElementById('status-filter').addEventListener('change', e => {
                 activeStatus = e.target.value;
                 renderModules();
-                lucide.createIcons();
+                safeRefreshIcons();
             });
 
             // Category Pills
@@ -1664,7 +1646,7 @@
 
                     activeCategory = btn.dataset.category;
                     renderModules();
-                    lucide.createIcons();
+                    safeRefreshIcons();
                 });
             });
 
@@ -1687,7 +1669,7 @@
                 document.getElementById('expand-all-label').textContent = allExpanded ? 'Collapse All' : 'Expand All';
                 saveState(false);
                 renderModules();
-                lucide.createIcons();
+                safeRefreshIcons();
             });
 
             // Backup Dropdown Toggle
@@ -1770,21 +1752,21 @@
                 });
             });
 
-            // Initialize Payday Countdown & Render Dashboard
+            // Step 1: Immediately calculate 25th payday countdown & render full UI from localStorage
             updatePaydayCountdown();
             renderAll();
 
-            // Initialize Google Sheets Sync Modal & Auto-Pull on Load
+            // Step 2: Configure Google Sheets Sync Modal & Auto-Pull on Load
             const syncModal = document.getElementById('sync-modal');
             const urlInput = document.getElementById('apps-script-url-input');
-            urlInput.value = sheetsWebAppUrl;
+            urlInput.value = sheetsWebAppUrl || DEFAULT_APPS_SCRIPT_URL;
 
             document.getElementById('cloud-sync-btn').addEventListener('click', () => {
-                urlInput.value = sheetsWebAppUrl;
+                urlInput.value = sheetsWebAppUrl || DEFAULT_APPS_SCRIPT_URL;
                 setSyncStatusUI(sheetsWebAppUrl ? 'synced' : 'offline');
                 syncModal.classList.remove('hidden');
                 syncModal.classList.add('flex');
-                lucide.createIcons();
+                safeRefreshIcons();
             });
 
             document.getElementById('close-sync-modal-btn').addEventListener('click', () => {
@@ -1799,37 +1781,42 @@
                     return;
                 }
                 sheetsWebAppUrl = val;
-                localStorage.setItem(SYNC_URL_KEY, sheetsWebAppUrl);
-                await pullFromGoogleSheets(false);
+                try {
+                    localStorage.removeItem(SYNC_DISABLED_KEY);
+                    localStorage.setItem(SYNC_URL_KEY, sheetsWebAppUrl);
+                } catch (_) {}
+                await pullFromSheets(false);
             });
 
             document.getElementById('disconnect-sync-btn').addEventListener('click', () => {
                 sheetsWebAppUrl = '';
-                urlInput.value = '';
-                localStorage.removeItem(SYNC_URL_KEY);
+                try {
+                    localStorage.setItem(SYNC_DISABLED_KEY, 'true');
+                    localStorage.removeItem(SYNC_URL_KEY);
+                } catch (_) {}
                 setSyncStatusUI('offline');
                 showToast('Disconnected from Google Sheets. Using local browser storage.', 'info');
             });
 
             document.getElementById('manual-pull-btn').addEventListener('click', () => {
                 if (!sheetsWebAppUrl) {
-                    showToast('Paste and save your Apps Script Web App URL first.', 'error');
+                    showToast('Click Save & Connect first to enable Google Sheets sync.', 'error');
                     return;
                 }
-                pullFromGoogleSheets(false);
+                pullFromSheets(false);
             });
 
             document.getElementById('manual-push-btn').addEventListener('click', () => {
                 if (!sheetsWebAppUrl) {
-                    showToast('Paste and save your Apps Script Web App URL first.', 'error');
+                    showToast('Click Save & Connect first to enable Google Sheets sync.', 'error');
                     return;
                 }
-                pushToGoogleSheets(false);
+                pushToSheets(false);
             });
 
-            // Auto-pull latest progress from Google Sheets on startup if configured
+            // Auto-pull latest progress from Google Sheets asynchronously
             if (sheetsWebAppUrl) {
-                pullFromGoogleSheets(true);
+                pullFromSheets(true);
             } else {
                 setSyncStatusUI('offline');
             }
